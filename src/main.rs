@@ -6,11 +6,11 @@ use ats_pr::threshold::ThresholdKeyPairs;
 // Sample params for T-of-N threshold sig
 const T: usize = 2;
 const N: usize = 5;
-const QUORUM: [usize; 2] = [0, 3];
+const QUORUM: [usize; 2] = [0, 2];
 
 fn main() {
     let tkp = ThresholdKeyPairs::new(N, T);
-    tkp.get_X(&QUORUM.to_vec());
+    tkp.quorum_X(&QUORUM.to_vec());
 
     // let tk = tkp.keys[0] + tkp.keys[1];
     // let message_bytes: [u8; 5] = [1, 2, 3, 4, 5];
