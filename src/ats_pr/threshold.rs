@@ -48,29 +48,16 @@ impl ThresholdKeyPairs {
     }
 
     pub fn quorum_X(&self, quorum: &Vec<usize>) {
-        // (1, 6)
-        // (3, 8)
-        // should find: (0, 5)
-        // let tester: Vec<FE2> = vec![
-        //     ECScalar::from(&BigInt::from(6u32)),
-        //     ECScalar::from(&BigInt::from(8u32)),
-        // ];
-
-        // println!(
-        //     "{:?}",
-        //     lagrange_interpolate_f0(
-        //         &quorum
-        //             .into_iter()
-        //             .map(|idx: &usize| idx + 1)
-        //             .zip(tester.into_iter())
-        //             .collect(),
-        //     )
-        // )
-
-        let tester: Vec<usize> = vec![6, 8];
+        // (2, 6)
+        // (4, 8)
+        // should find: (0, 4)
+        let tester: Vec<FE2> = vec![
+            ECScalar::from(&BigInt::from(6u32)),
+            ECScalar::from(&BigInt::from(8u32)),
+        ];
 
         println!(
-            "{:?}",
+            "f0: {:?}",
             lagrange_interpolate_f0(
                 &quorum
                     .into_iter()
@@ -78,6 +65,6 @@ impl ThresholdKeyPairs {
                     .zip(tester.into_iter())
                     .collect(),
             )
-        )
+        );
     }
 }

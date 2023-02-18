@@ -5,26 +5,29 @@ use crate::ats_pr::bls::GE1;
 
 use curv::BigInt;
 
-pub fn lagrange_coeff_f0(n: usize, j: usize) -> FE2 {
-    let fe1_j: FE2 = ECScalar::from(&BigInt::from(j as u32));
+pub fn lagrange_coeff_f0(points: &Vec<(usize, FE2)>, j: usize) -> FE2 {
+    println!("j: {}", j);
+    let fe2_xj: FE2 = ECScalar::from(&BigInt::from(points[j].0 as u32));
     let mut prod: FE2 = ECScalar::from(&BigInt::from(1));
-    for i in 1..=n {
+    for (i, pi) in points.iter().enumerate() {
         if i == j {
             continue;
         }
-        let fe1_i: FE2 = ECScalar::from(&BigInt::from(i as u32));
-        let diff = fe1_i.sub(&fe1_j.get_element());
-        prod = prod * fe1_i * diff.invert();
+        let fe2_xi: FE2 = ECScalar::from(&BigInt::from(points[i].0 as u32));
+        let diff: FE2 = fe2_xi.sub(&fe2_xj.get_element());
+        println!("fe2_xi: {:?}", fe2_xi);
+        println!("fe2_xj: {:?}", fe2_xj);
+        println!("diff: {:?}", diff);
+        prod = prod * fe2_xi * diff.invert();
+        println!("prod: {:?}", prod);
     }
     prod
 }
 
-pub fn lagrange_interpolate_f0(points: &Vec<(usize, usize)>) -> BigInt {
-    println!("POINTS {:?}", points);
-    // let mut summation: FE2 = ECScalar::from(&BigInt::from(0));
-    let mut summation: BigInt = BigInt::from(0);
-    for p in points {
-        summation = summation + lagrange_coeff_f0(points.len(), p.0).to_big_int() * BigInt::from(p.1 as u32);
+pub fn lagrange_interpolate_f0(points: &Vec<(usize, FE2)>) -> FE2 {
+    let mut summation: FE2 = ECScalar::from(&BigInt::from(0));
+    for (j, p) in points.iter().enumerate() {
+        summation = summation + lagrange_coeff_f0(points, j) * p.1;
     }
     summation
 }
