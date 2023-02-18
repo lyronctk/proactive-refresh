@@ -1,10 +1,10 @@
+use crate::ats_pr::bls::ECPoint;
 use crate::ats_pr::bls::ECScalar;
 use crate::ats_pr::bls::KeyPairG2;
 use crate::ats_pr::bls::FE2;
 use crate::ats_pr::bls::GE2;
-use crate::ats_pr::lagrange::lagrange_interpolate_f0;
-
-use curv::BigInt;
+use crate::ats_pr::lagrange::lagrange_interpolate_f0_X;
+use crate::ats_pr::lagrange::lagrange_interpolate_f0_x;
 
 #[derive(Debug)]
 pub struct ThresholdKeyPairs {
@@ -47,24 +47,23 @@ impl ThresholdKeyPairs {
             .collect()
     }
 
-    pub fn quorum_X(&self, quorum: &Vec<usize>) {
-        // (2, 6)
-        // (4, 8)
-        // should find: (0, 4)
-        let tester: Vec<FE2> = vec![
-            ECScalar::from(&BigInt::from(6u32)),
-            ECScalar::from(&BigInt::from(8u32)),
-        ];
+    pub fn quorum_X(&self, quorum: &Vec<usize>) -> GE2 {
+        lagrange_interpolate_f0_X(
+            &quorum
+                .into_iter()
+                .map(|idx: &usize| idx + 1)
+                .zip(self.get_X(&quorum).into_iter())
+                .collect()
+        )
+    }
 
-        println!(
-            "f0: {:?}",
-            lagrange_interpolate_f0(
-                &quorum
-                    .into_iter()
-                    .map(|idx: &usize| idx + 1)
-                    .zip(tester.into_iter())
-                    .collect(),
-            )
-        );
+    pub fn quorum_x(&self, quorum: &Vec<usize>) -> FE2 {
+        lagrange_interpolate_f0_x(
+            &quorum
+                .into_iter()
+                .map(|idx: &usize| idx + 1)
+                .zip(self.get_x(&quorum).into_iter())
+                .collect()
+        )
     }
 }
