@@ -11,13 +11,15 @@ use curv::BigInt;
 pub struct ThresholdKeyPairs {
     pub keys: Vec<KeyPairG2>,
     n: usize,
+    t: usize 
 }
 
 impl ThresholdKeyPairs {
-    pub fn new(_n: usize) -> Self {
+    pub fn new(_n: usize, _t: usize) -> Self {
         Self {
             keys: vec![KeyPairG2::new(); _n],
             n: _n,
+            t: _t
         }
     }
 

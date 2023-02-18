@@ -9,11 +9,10 @@ const N: usize = 5;
 const QUORUM: [usize; 2] = [0, 3];
 
 fn main() {
-    let tkp = ThresholdKeyPairs::new(N);
-    // let tk = tkp.keys[0] + tkp.keys[1];
-
+    let tkp = ThresholdKeyPairs::new(N, T);
     println!("{:?}", tkp.get_X(&QUORUM.to_vec()));
 
+    // let tk = tkp.keys[0] + tkp.keys[1];
     // let message_bytes: [u8; 5] = [1, 2, 3, 4, 5];
     // let sig: BLSSignature = BLSSignature::sign(&message_bytes[..], &tk.x);
     // println!("{}", sig.verify(&message_bytes[..], &tkp.keys[0].X));
