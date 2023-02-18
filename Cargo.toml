@@ -1,0 +1,18 @@
+[package]
+name = "ats-bls-pr"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ff-zeroize = "0.6.3"
+pairing-plus = "0.19"
+
+[dependencies.curv]
+git = "https://github.com/ZenGo-X/curv"
+tag = "v0.6.2"
+default-features = false
+
+[features]
+default = ["curv/rust-gmp-kzen"]
