@@ -31,7 +31,7 @@ impl ProactiveRefresh {
     // producing gamma [i, 1], sends f_i(j) to signer j
     pub fn update_one(&self, sk: FE2) -> FE2 {
         let t: usize = self.tkp.t;
-        let _n: usize = self.tkp.n + 1;
+        let n: usize = self.tkp.n;
 
         let mut samples: Vec<FE2> = Vec::new();
         let mut gammas: Vec<FE2> = Vec::new();
@@ -43,7 +43,7 @@ impl ProactiveRefresh {
 
         // compute gammas and gamma sum
         let mut gamma_sum: FE2 = ECScalar::from(&BigInt::from(0)); 
-        for j in 1.._n {
+        for j in 1..=n {
             let mut gamma: FE2 = ECScalar::from(&BigInt::from(0));
             for l in 1..t {
                 let j_elem: u32 = (j as u32).pow(l as u32);
