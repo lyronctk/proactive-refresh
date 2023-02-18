@@ -1,2 +1,4 @@
 target/
 Cargo.lock
+pot25_final.ptau
+node_modules
