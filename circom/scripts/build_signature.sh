@@ -41,6 +41,8 @@ echo "DONE ($((end-start))s)"
 cd ..
 snarkjs wej witness.wtns witness.json
 
+exit 0
+
 echo "****GENERATING ZKEY 0****"
 start=`date +%s`
 /data/node/out/Release/node --trace-gc --trace-gc-ignore-scavenger --max-old-space-size=2048000 --initial-old-space-size=2048000 --no-global-gc-scheduling --no-incremental-marking --max-semi-space-size=1024 --initial-heap-size=2048000 --expose-gc /data/snarkjs/cli.js zkey new "$CIRCUIT_NAME".r1cs "$PHASE1" "$CIRCUIT_NAME"_0.zkey -v > zkey0.out
