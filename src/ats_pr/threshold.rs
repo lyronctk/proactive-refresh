@@ -1,7 +1,7 @@
 use crate::ats_pr::bls::FE2;
 use crate::ats_pr::bls::GE2;
 use crate::ats_pr::bls::KeyPairG2;
-use crate::ats_pr::utils::tmp;
+use crate::ats_pr::utils::lagrange_coeff_f0;
 
 #[derive(Debug)]
 pub struct ThresholdKeyPairs {
@@ -31,7 +31,7 @@ impl ThresholdKeyPairs {
     }
 
     pub fn get_X(&self, quorum: &Vec<usize>) -> Vec<GE2> {
-        tmp();
+        println!("{:?}", lagrange_coeff_f0(self.n, 0));
         self.get_quorum(quorum)
             .into_iter()
             .map(|key: &KeyPairG2| key.X)
