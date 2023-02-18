@@ -1,11 +1,7 @@
-use crate::ats_pr::bls::KeyPairG2;
-use crate::ats_pr::bls::FE1;
 use crate::ats_pr::bls::FE2;
-use crate::ats_pr::bls::GE1;
 use crate::ats_pr::bls::GE2;
-
-use curv::elliptic::curves::traits::ECScalar;
-use curv::BigInt;
+use crate::ats_pr::bls::KeyPairG2;
+use crate::ats_pr::utils::tmp;
 
 #[derive(Debug)]
 pub struct ThresholdKeyPairs {
@@ -35,6 +31,7 @@ impl ThresholdKeyPairs {
     }
 
     pub fn get_X(&self, quorum: &Vec<usize>) -> Vec<GE2> {
+        tmp();
         self.get_quorum(quorum)
             .into_iter()
             .map(|key: &KeyPairG2| key.X)
@@ -46,20 +43,6 @@ impl ThresholdKeyPairs {
             .into_iter()
             .map(|key: &KeyPairG2| key.x)
             .collect()
-    }
-
-    fn lagrange_coeff_f0(&self, party_idx: usize) {
-        let j: usize = party_idx + 1; // since quorum is 0-indexed
-        let fe1_j: FE1 = ECScalar::from(&BigInt::from(j as u32));
-        let mut prod: FE1 = ECScalar::from(&BigInt::from(1));
-        for i in 1..=self.n {
-            if i == j {
-                continue;
-            }
-            let fe1_i: FE1 = ECScalar::from(&BigInt::from(i as u32));
-            let diff = fe1_i.sub(&fe1_j.get_element());
-            prod = prod * fe1_i * diff.invert();
-        }
     }
 
     // pub fn quorum_X(&self, quorum: &Vec<usize>) -> FE2 {

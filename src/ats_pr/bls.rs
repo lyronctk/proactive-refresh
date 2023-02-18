@@ -9,9 +9,6 @@ pub use curv::elliptic::curves::bls12_381::g2::GE as GE2;
 pub use curv::elliptic::curves::bls12_381::Pair;
 pub use curv::elliptic::curves::traits::{ECPoint, ECScalar};
 
-use ff_zeroize::Field;
-use pairing_plus::bls12_381::Fq12;
-
 #[derive(Clone, Copy, Debug)]
 pub struct KeyPairG2 {
     pub X: GE2,

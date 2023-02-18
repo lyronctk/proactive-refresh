@@ -10,7 +10,7 @@ const QUORUM: [usize; 2] = [0, 3];
 
 fn main() {
     let tkp = ThresholdKeyPairs::new(N, T);
-    println!("{:?}", tkp.get_X(&QUORUM.to_vec()));
+    tkp.get_X(&QUORUM.to_vec());
 
     // let tk = tkp.keys[0] + tkp.keys[1];
     // let message_bytes: [u8; 5] = [1, 2, 3, 4, 5];
