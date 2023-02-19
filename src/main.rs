@@ -13,8 +13,8 @@ use std::fs::File;
 // Demo simulation params
 const T: usize = 5;
 const N: usize = 7;
-const QUORUM: [usize; 3] = [0, 1, 2];
-const BREACHES: [(usize, usize); 5] = [(2, 2), (5, 5), (7, 6), (10, 4), (14, 3)];
+const QUORUM: [usize; 5] = [0, 1, 2, 3, 4];
+const BREACHES: [(usize, usize); 5] = [(2, 1), (5, 6), (7, 5), (10, 3), (14, 2)];
 const MAX_TIME: usize = 15;
 
 const OUT_FILE: &str = "./out/sim.json";
@@ -31,25 +31,64 @@ fn format_pkx(committee: &ProactiveRefresh) -> Vec<String> {
 
 fn main() {
     let mut committee: ProactiveRefresh = ProactiveRefresh::new(N, T);
+    let mut committee_pr: ProactiveRefresh = ProactiveRefresh::new(N, T);
 
+    let mut secure: Vec<bool> = vec![true; N];
+    let mut secure_pr: Vec<bool> = vec![true; N];
+
+    let mut is_breached = false;
+    let mut is_breached_pr = false;
+
+    let mut breach_ctr = 0; 
     let mut epochs = Vec::new();
     for i in 0..MAX_TIME {
+
+        if breach_ctr < BREACHES.len() && BREACHES[breach_ctr].0 == i {
+            secure[BREACHES[breach_ctr].1] = false;
+            secure_pr[BREACHES[breach_ctr].1] = false;
+        }
+        if breach_ctr == BREACHES.len() - 1 {
+            is_breached = true;
+        }
+
         let mut pk_status = Vec::new();
-        for pkx in format_pkx(&committee) {
+        for (j, pkx) in format_pkx(&committee).iter().enumerate() {
             let mut hm = HashMap::new();
-            hm.insert("key", pkx);
-            hm.insert("secure", false.to_string());
+            hm.insert("key", pkx.clone());
+            hm.insert("secure", secure[j].to_string());
             pk_status.push(hm);
         }
+        let cx = ECScalar::to_big_int(&committee.tkp.quorum_x(&QUORUM.to_vec()));
+
+        let mut pk_status_pr = Vec::new();
+        for (j, pkx) in format_pkx(&committee_pr).iter().enumerate() {
+            let mut hm = HashMap::new();
+            hm.insert("key", pkx.clone());
+            hm.insert("secure", secure_pr[j].to_string());
+            pk_status_pr.push(hm);
+        }        
+        let cx_pr = ECScalar::to_big_int(&committee_pr.tkp.quorum_x(&QUORUM.to_vec()));
+
         let epoch_json = json!({
             "time": i,
-            "ats_ptr": {
-                "breached": false,
-                "pks": pk_status
+            "ats": {
+                "breached": is_breached.to_string(),
+                "collective_pk": "0x".to_string() + &cx.to_str_radix(16),
+                "pks": pk_status      
+            },
+            "ats_pr": {
+                "breached": is_breached_pr.to_string(),
+                "collective_pk": "0x".to_string() + &cx_pr.to_str_radix(16),
+                "pks": pk_status_pr
             }
         });
         epochs.push(epoch_json);
-        committee.refresh_all();
+
+        if BREACHES[breach_ctr].0 == i {
+            secure_pr[BREACHES[breach_ctr].1] = true;
+            breach_ctr += 1;
+        }
+        committee_pr.refresh_all();
     }
     serde_json::to_writer(&File::create(OUT_FILE).unwrap(), &epochs).unwrap();
 
@@ -67,7 +106,6 @@ fn main() {
     // println!("all new sks: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
 
     // println!("=== ATS");
-
     // let mut sig: ThresholdSignature =
     //     ThresholdSignature::sign(&message_bytes[..], &tkp, &QUORUM.to_vec());
     // println!("signature: {:?}", sig);
