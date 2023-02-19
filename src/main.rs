@@ -1,55 +1,31 @@
 mod ats_pr;
 
+use ats_pr::bls::BLSSignature;
 use ats_pr::pr::ProactiveRefresh;
-use ats_pr::threshold::{ThresholdKeyPairs, ThresholdSignature};
+use ats_pr::threshold::ThresholdKeyPairs;
 
-use curv::arithmetic::Converter;
-use curv::elliptic::curves::traits::ECScalar;
 
-use serde_json::json;
-use std::collections::HashMap;
-use std::fs::File;
-
-// Demo simulation params
-const T: usize = 5;
-const N: usize = 7;
-const QUORUM: [usize; 5] = [0, 1, 2, 3, 4];
-const BREACHES: [(usize, usize); 5] = [(2, 1), (5, 6), (7, 5), (10, 3), (14, 2)];
-const MAX_TIME: usize = 15;
-
-const OUT_FILE: &str = "./out/sim.json";
-
-fn format_pkx(committee: &ProactiveRefresh) -> Vec<String> {
-    Vec::from_iter(
-        committee
-            .tkp
-            .get_x(&Vec::from_iter(0..N))
-            .into_iter()
-            .map(|x| "0x".to_string() + &x.to_big_int().to_str_radix(16)),
-    )
-}
+// Sample params for T-of-N threshold sig
+const T: usize = 2;
+const N: usize = 5;
+const QUORUM: [usize; 2] = [0, 3];
 
 fn main() {
-    let mut committee: ProactiveRefresh = ProactiveRefresh::new(N, T);
-    let mut committee_pr: ProactiveRefresh = ProactiveRefresh::new(N, T);
+    // let tkp = ThresholdKeyPairs::new(N, T);
 
-    let mut secure: Vec<bool> = vec![true; N];
-    let mut secure_pr: Vec<bool> = vec![true; N];
+    // test one sk rotation
+    let pr1 = ProactiveRefresh::new(N, T);
+    let sk_old = pr1.tkp.keys[0].x;
+    println!("single old sk: {:?}", sk_old);
+    let sk_new = pr1.update_one(sk_old);
+    println!("single new sk: {:?}", sk_new);
 
-    let mut is_breached = false;
-    let mut is_breached_pr = false;
-
-    let mut breach_ctr = 0; 
-    let mut epochs = Vec::new();
-    for i in 0..MAX_TIME {
-
-        if breach_ctr < BREACHES.len() && BREACHES[breach_ctr].0 == i {
-            secure[BREACHES[breach_ctr].1] = false;
-            secure_pr[BREACHES[breach_ctr].1] = false;
-        }
-        if breach_ctr == BREACHES.len() - 1 {
-            is_breached = true;
-        }
+    // test all sk rotation
+    let mut pr2:ProactiveRefresh = ProactiveRefresh::new(N, T);
+    println!("all old: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
+    pr2.update_all();
+    println!("all new: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
+    //
 
         let mut pk_status = Vec::new();
         for (j, pkx) in format_pkx(&committee).iter().enumerate() {
@@ -66,7 +42,7 @@ fn main() {
             hm.insert("key", pkx.clone());
             hm.insert("secure", secure_pr[j].to_string());
             pk_status_pr.push(hm);
-        }        
+        }
         let cx_pr = ECScalar::to_big_int(&committee_pr.tkp.quorum_x(&QUORUM.to_vec()));
 
         let epoch_json = json!({
@@ -74,7 +50,7 @@ fn main() {
             "ats": {
                 "breached": is_breached.to_string(),
                 "collective_pk": "0x".to_string() + &cx.to_str_radix(16),
-                "pks": pk_status      
+                "pks": pk_status
             },
             "ats_pr": {
                 "breached": is_breached_pr.to_string(),
