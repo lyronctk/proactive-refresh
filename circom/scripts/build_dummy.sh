@@ -46,3 +46,9 @@ yarn run snarkjs zkey export solidityverifier "$BUILD_DIR"/"$CIRCUIT_NAME".zkey 
 # sed -i -e 's/0.6.11;/0.8.13;/g' "$CIRCUIT_NAME"Verifier.sol
 # mv "$CIRCUIT_NAME"Verifier.sol ../contracts
 # rm "$CIRCUIT_NAME"Verifier.sol-e
+
+echo "****GENERATE PROOF FOR SAMPLE INPUT****"
+start=`date +%s`
+yarn run snarkjs groth16 prove "$BUILD_DIR"/"$CIRCUIT_NAME".zkey "$BUILD_DIR"/"$CIRCUIT_NAME".wtns "$BUILD_DIR"/"$CIRCUIT_NAME"-proof.json "$BUILD_DIR"/"$CIRCUIT_NAME"-public.json
+end=`date +%s`
+echo "DONE ($((end-start))s)"
