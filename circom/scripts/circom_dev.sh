@@ -44,7 +44,7 @@ echo "DONE EXPORTING VERIFICATION KEY ($((end-start))s)"
 node "$BUILD_DIR"/"$CIRCUIT_NAME"_js/generate_witness.js "$BUILD_DIR"/"$CIRCUIT_NAME".wasm "$BUILD_DIR"/"$CIRCUIT_NAME".json "$BUILD_DIR"/"$CIRCUIT_NAME".wtns
 
 # Export verifier to smart contract for on-chain verification
-yarn run snarkjs zkey export solidityverifier "$CIRCUIT_NAME".zkey "$CIRCUIT_NAME"Verifier.sol
-sed -i -e 's/0.6.11;/0.8.13;/g' "$CIRCUIT_NAME"Verifier.sol
-mv "$CIRCUIT_NAME"Verifier.sol ../contracts
-rm "$CIRCUIT_NAME"Verifier.sol-e
+yarn run snarkjs zkey export solidityverifier "$CIRCUIT_NAME".zkey "$BUILD_DIR"/"$CIRCUIT_NAME"Verifier.sol
+# sed -i -e 's/0.6.11;/0.8.13;/g' "$CIRCUIT_NAME"Verifier.sol
+# mv "$CIRCUIT_NAME"Verifier.sol ../contracts
+# rm "$CIRCUIT_NAME"Verifier.sol-e

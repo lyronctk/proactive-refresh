@@ -4,7 +4,7 @@
 # Powers of tau selection for Hermez Rollup
 PTAU=/Users/jaclyn/Documents/code/ats-pr-bls/circom/circuits/pot15_final.ptau
 CIRCUIT_NAME=dummy
-BUILD_DIR=/Users/jaclyn/Documents/code/ats-pr-bls/circom/build
+BUILD_DIR=/Users/jaclyn/Documents/code/ats-pr-bls/circom/build/"$CIRCUIT_NAME"
 
 if [ -f "$PTAU" ]; then
     echo "Found Phase 1 ptau file"
