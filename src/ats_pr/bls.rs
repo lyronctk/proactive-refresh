@@ -2,15 +2,14 @@
 
 use std::ops::Add;
 
-pub use curv::elliptic::curves::bls12_381::g1::FE as FE1;
-pub use curv::elliptic::curves::bls12_381::g1::GE as GE1;
-pub use curv::elliptic::curves::bls12_381::g2::FE as FE2;
-pub use curv::elliptic::curves::bls12_381::g2::GE as GE2;
-pub use curv::elliptic::curves::bls12_381::Pair;
+pub use curv::elliptic::curves::bls12_381::{
+    g1::FE as FE1,
+    g1::GE as GE1,
+    g2::FE as FE2,
+    g2::GE as GE2,
+    Pair,
+};
 pub use curv::elliptic::curves::traits::{ECPoint, ECScalar};
-
-use ff_zeroize::Field;
-use pairing_plus::bls12_381::Fq12;
 
 #[derive(Clone, Copy, Debug)]
 pub struct KeyPairG2 {
@@ -20,7 +19,7 @@ pub struct KeyPairG2 {
 
 #[derive(Debug)]
 pub struct BLSSignature {
-    sigma: GE1,
+    pub sigma: GE1,
 }
 
 impl KeyPairG2 {
