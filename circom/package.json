@@ -15,7 +15,6 @@
     "circomlib": "^2.0.2",
     "snarkjs": "^0.4.10",
     "circomlibjs": "^0.1.2",
-    "hardhat": "^2.9.1",
     "hardhat-circom": "^3.3.2"
   }
 }

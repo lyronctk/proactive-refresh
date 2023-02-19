@@ -23,11 +23,12 @@ start=`date +%s`
 #circom "$CIRCUIT_NAME".circom --O0 --c --output "$BUILD_DIR"
 circom "$CIRCUIT_NAME".circom --O1 --r1cs --sym --c --output "$BUILD_DIR"
 end=`date +%s`
-echo "DONE ($((end-start))s)"
+echo "DONE COMPILING CIRCUIT ($((end-start))s)"
 
 echo "****COMPILING C++ WITNESS GENERATION CODE****"
 start=`date +%s`
 cd "$BUILD_DIR"/"$CIRCUIT_NAME"_cpp
+export CPATH="$CPATH:/opt/homebrew/opt/nlohmann-json/include:/opt/homebrew/opt/gmp/include"
 make
 end=`date +%s`
 echo "DONE ($((end-start))s)"
@@ -40,8 +41,6 @@ echo "DONE ($((end-start))s)"
 
 cd ..
 snarkjs wej witness.wtns witness.json
-
-exit 0
 
 echo "****GENERATING ZKEY 0****"
 start=`date +%s`
