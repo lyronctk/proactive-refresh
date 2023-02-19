@@ -2,9 +2,9 @@
 
 ### Boilerplate circuit compilation and vkey/zkey generation for development
 # Powers of tau selection for Hermez Rollup
-PTAU=/Users/kayleegeorge/code/zk/ats-pr-bls/circom/circuits/pot15_final.ptau
+PTAU=/Users/jaclyn/Documents/code/ats-pr-bls/circom/circuits/pot15_final.ptau
 CIRCUIT_NAME=dummy
-BUILD_DIR=/Users/kayleegeorge/code/zk/ats-pr-bls/circom/build
+BUILD_DIR=/Users/jaclyn/Documents/code/ats-pr-bls/circom/build
 
 if [ -f "$PTAU" ]; then
     echo "Found Phase 1 ptau file"
@@ -42,7 +42,7 @@ echo "DONE EXPORTING VERIFICATION KEY ($((end-start))s)"
 node "$BUILD_DIR"/"$CIRCUIT_NAME"_js/generate_witness.js "$BUILD_DIR"/dummy_js/"$CIRCUIT_NAME".wasm "$BUILD_DIR"/"$CIRCUIT_NAME".json "$BUILD_DIR"/"$CIRCUIT_NAME".wtns
 
 # Export verifier to smart contract for on-chain verification
-yarn run snarkjs zkey export solidityverifier "$BUILD_DIR"/"$CIRCUIT_NAME".zkey "$BUILD_DIR"/Verifier.sol
-sed -i -e 's/0.6.11;/0.8.13;/g' "$CIRCUIT_NAME"Verifier.sol
-mv "$CIRCUIT_NAME"Verifier.sol ../contracts
-rm "$CIRCUIT_NAME"Verifier.sol-e
+yarn run snarkjs zkey export solidityverifier "$BUILD_DIR"/"$CIRCUIT_NAME".zkey "$BUILD_DIR"/"$CIRCUIT_NAME"Verifier.sol
+# sed -i -e 's/0.6.11;/0.8.13;/g' "$CIRCUIT_NAME"Verifier.sol
+# mv "$CIRCUIT_NAME"Verifier.sol ../contracts
+# rm "$CIRCUIT_NAME"Verifier.sol-e
