@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "build": "cd scripts && ./build_signature.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "circom:dev": "hardhat circom --deterministic --debug --verbose",
+    "circom:prod": "hardhat circom --verbose"
   },
   "repository": "git@github.com:lyronctk/ats-pr-bls.git",
   "author": "",
   "license": "ISC",
   "dependencies": {
     "circomlib": "^2.0.2",
-    "snarkjs": "^0.4.10"
+    "snarkjs": "^0.4.10",
+    "circomlibjs": "^0.1.2",
+    "hardhat-circom": "^3.3.2"
   }
 }
