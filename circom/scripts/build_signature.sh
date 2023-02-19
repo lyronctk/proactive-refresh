@@ -4,7 +4,7 @@ PHASE1=../circuits/pot25_final.ptau
 CIRCUIT_NAME=signature
 BUILD_DIR=../build/"$CIRCUIT_NAME"
 
-if [ -f "$PHASE1" ]; then
+if [ -f "$PTAU" ]; then
     echo "Found Phase 1 ptau file"
 else
     echo "No Phase 1 ptau file found. Exiting..."
