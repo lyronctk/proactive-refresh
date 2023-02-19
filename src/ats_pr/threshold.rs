@@ -12,13 +12,18 @@ pub struct ThresholdKeyPairs {
 
 #[derive(Debug)]
 pub struct ThresholdSignature {
-    sigma: GE1,
+    sig: BLSSignature,
+    pub quorum: Vec<usize>
 }
 
 impl ThresholdKeyPairs {
     pub fn new(_n: usize, _t: usize) -> Self {
+        let mut k: Vec<KeyPairG2> = Vec::new();
+        for i in 0.._n {
+            k.push(KeyPairG2::new());
+        }
         Self {
-            keys: vec![KeyPairG2::new(); _n],
+            keys: k,
             n: _n,
             t: _t,
         }
@@ -84,6 +89,15 @@ impl ThresholdSignature {
                 .zip(sigmas.into_iter())
                 .collect(),
         );
-        ThresholdSignature { sigma: sigma }
+        ThresholdSignature { sig: BLSSignature { sigma: sigma }, quorum: quorum.clone() }
+    }
+
+    pub fn verify(&self, message: &[u8], tkps: &ThresholdKeyPairs) -> bool {
+        if self.quorum.len() < tkps.t {
+            println!("- Verification failed. Quorum has fewer than t participants.");
+            return false;
+        }
+        let X: GE2 = tkps.quorum_X(&self.quorum);
+        return self.sig.verify(message, &X);
     }
 }
