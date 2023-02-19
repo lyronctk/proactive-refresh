@@ -1,7 +1,4 @@
-use crate::ats_pr::bls::ECPoint;
-use crate::ats_pr::bls::ECScalar;
-use crate::ats_pr::bls::FE2;
-use crate::ats_pr::bls::GE2;
+use crate::ats_pr::bls::{ECPoint, ECScalar, FE1, FE2, GE1, GE2};
 
 use curv::BigInt;
 
@@ -19,9 +16,9 @@ pub fn lagrange_coeff_f0<T>(points: &Vec<(usize, T)>, j: usize) -> FE2 {
     prod
 }
 
-// [TODO] Combine both functions below into one generic
+// [TODO] Combine functions below into one generic
 pub fn lagrange_interpolate_f0_X(points: &Vec<(usize, GE2)>) -> GE2 {
-    println!("POINTS FOR X: {:?}", points);
+    // println!("POINTS FOR X: {:?}", points);
     let mut summation: GE2 = GE2::generator().sub_point(&GE2::generator().get_element());
     for (j, p) in points.iter().enumerate() {
         summation = summation + p.1 * lagrange_coeff_f0(points, j);
@@ -30,10 +27,20 @@ pub fn lagrange_interpolate_f0_X(points: &Vec<(usize, GE2)>) -> GE2 {
 }
 
 pub fn lagrange_interpolate_f0_x(points: &Vec<(usize, FE2)>) -> FE2 {
-    println!("POINTS FOR x: {:?}", points);
+    // println!("POINTS FOR x: {:?}", points);
     let mut summation: FE2 = FE2::zero();
     for (j, p) in points.iter().enumerate() {
         summation = summation + p.1 * lagrange_coeff_f0(points, j);
+    }
+    summation
+}
+
+pub fn lagrange_interpolate_f0_sig(points: &Vec<(usize, GE1)>) -> GE1 {
+    // println!("POINTS FOR x: {:?}", points);
+    let mut summation: GE1 = GE1::generator().sub_point(&GE1::generator().get_element());
+    for (j, p) in points.iter().enumerate() {
+        let lambda: FE1 = ECScalar::from(&ECScalar::to_big_int(&lagrange_coeff_f0(points, j)));
+        summation = summation + p.1 * lambda;
     }
     summation
 }

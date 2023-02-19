@@ -1,16 +1,18 @@
-use crate::ats_pr::bls::ECPoint;
-use crate::ats_pr::bls::ECScalar;
-use crate::ats_pr::bls::KeyPairG2;
-use crate::ats_pr::bls::FE2;
-use crate::ats_pr::bls::GE2;
-use crate::ats_pr::lagrange::lagrange_interpolate_f0_X;
-use crate::ats_pr::lagrange::lagrange_interpolate_f0_x;
+use crate::ats_pr::bls::{BLSSignature, ECPoint, ECScalar, KeyPairG2, FE1, FE2, GE1, GE2};
+use crate::ats_pr::lagrange::{
+    lagrange_interpolate_f0_X, lagrange_interpolate_f0_sig, lagrange_interpolate_f0_x,
+};
 
 #[derive(Debug)]
 pub struct ThresholdKeyPairs {
     pub keys: Vec<KeyPairG2>,
     n: usize,
     t: usize,
+}
+
+#[derive(Debug)]
+pub struct ThresholdSignature {
+    sigma: GE1,
 }
 
 impl ThresholdKeyPairs {
@@ -54,7 +56,7 @@ impl ThresholdKeyPairs {
                 .into_iter()
                 .map(|idx: &usize| idx + 1)
                 .zip(self.get_X(&quorum).into_iter())
-                .collect()
+                .collect(),
         )
     }
 
@@ -64,7 +66,24 @@ impl ThresholdKeyPairs {
                 .into_iter()
                 .map(|idx: &usize| idx + 1)
                 .zip(self.get_x(&quorum).into_iter())
-                .collect()
+                .collect(),
         )
+    }
+}
+
+impl ThresholdSignature {
+    pub fn sign(message: &[u8], tkps: &ThresholdKeyPairs, quorum: &Vec<usize>) -> Self {
+        let mut sigmas: Vec<GE1> = Vec::new();
+        for x in tkps.get_x(quorum) {
+            sigmas.push(BLSSignature::sign(message, &x).sigma);
+        }
+        let sigma = lagrange_interpolate_f0_sig(
+            &quorum
+                .into_iter()
+                .map(|idx: &usize| idx + 1)
+                .zip(sigmas.into_iter())
+                .collect(),
+        );
+        ThresholdSignature { sigma: sigma }
     }
 }
