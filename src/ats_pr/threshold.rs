@@ -33,6 +33,7 @@ impl ThresholdKeyPairs {
         q
     }
 
+    // [TODO] Convert functions below for generics that accept GE2 or FE2
     pub fn get_X(&self, quorum: &Vec<usize>) -> Vec<GE2> {
         self.get_quorum_keys(quorum)
             .into_iter()
