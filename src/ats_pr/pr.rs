@@ -8,28 +8,37 @@ use super::threshold::ThresholdKeyPairs;
 
 #[derive(Debug)]
 pub struct ProactiveRefresh {
-    pub tkp: ThresholdKeyPairs
+    pub tkp: ThresholdKeyPairs,
+    pub gammas: Vec<Vec<FE2>> 
 }
-
-/* todo: ask lyron about FE1 and ECScalar types, private . */
 
 impl ProactiveRefresh {
     pub fn new(_n: usize, _t: usize) -> Self {
+        let mut g: Vec<Vec<FE2>> = Vec::with_capacity(_n);
+        for _i in 0.._n {
+            g.push(Vec::with_capacity(_n));
+        }
         Self {
-            tkp: ThresholdKeyPairs::new(_n, _t)
+            tkp: ThresholdKeyPairs::new(_n, _t),
+            gammas: g
         }
     }
 
     /* update all sk part of threshold keypairs */
-    pub fn update_all(&mut self) {
+    pub fn refresh_all(&mut self) {
+        
+        // generate gammas
         for i in 0..self.tkp.keys.len() {
-            let old_sk = self.tkp.keys[i].x; 
-            self.tkp.keys[i].x = self.update_one(old_sk);
+            self.gammas[i] = self.update_0(self.tkp.keys[i].x);
         }
+        // update secret keys
+        for j in 0..self.tkp.keys.len() {
+            self.tkp.keys[j].x = self.update_1(self.tkp.keys[j].x, j);
+        } 
     }
 
     // producing gamma [i, 1], sends f_i(j) to signer j
-    pub fn update_one(&self, sk: FE2) -> FE2 {
+    pub fn update_0(&self, sk: FE2) -> Vec<FE2> {
         let t: usize = self.tkp.t;
         let n: usize = self.tkp.n;
 
@@ -41,8 +50,7 @@ impl ProactiveRefresh {
             samples.push(ECScalar::new_random());
         }
 
-        // compute gammas and gamma sum
-        let mut gamma_sum: FE2 = ECScalar::from(&BigInt::from(0)); 
+        // compute gammas
         for j in 1..=n {
             let mut gamma: FE2 = ECScalar::from(&BigInt::from(0));
             for l in 1..t {
@@ -51,10 +59,16 @@ impl ProactiveRefresh {
                 gamma = gamma + samples[l - 1] * fe1_j;
             }
             gammas.push(gamma); 
-            gamma_sum = gamma_sum + gamma;
         }
-        
-        // update secret keys
+        return gammas
+    }
+
+    pub fn update_1(&self, sk: FE2, j: usize) -> FE2 {
+        let n: usize = self.tkp.n;
+        let mut gamma_sum: FE2 = ECScalar::from(&BigInt::from(0)); 
+        for i in 1..=n {
+            gamma_sum = gamma_sum + self.gammas[i - 1][j];
+        }
         return sk + gamma_sum
     }
 }
