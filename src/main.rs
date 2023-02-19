@@ -23,12 +23,14 @@ fn main() {
     let sk_new = pr1.update_one(sk_old);
     println!("single new sk: {:?}", sk_new);
 
+
     // test all sk rotation
     let mut pr2:ProactiveRefresh = ProactiveRefresh::new(N, T);
-    println!("al old: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
+    println!("all old aggregate: {:?}", pr2.tkp.quorum_X(&QUORUM.to_vec()));
+    println!("all old sk: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
     pr2.update_all();
-    println!("all new: {:?}", pr2.tkp.get_x(&QUORUM.to_vec())); 
-    // 
+    println!("all new aggregate: {:?}", pr2.tkp.quorum_X(&QUORUM.to_vec()));
+    println!("all new sk: {:?}", pr2.tkp.get_x(&QUORUM.to_vec())); 
 
     println!("=== ATS");
 
@@ -42,4 +44,3 @@ fn main() {
     sig.quorum = vec![1, 4];
     println!("for adversarial quorum: {}", sig.verify(&message_bytes[..], &tkp));
 }
-
