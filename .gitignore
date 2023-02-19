@@ -3,3 +3,4 @@ Cargo.lock
 pot*_final.ptau
 node_modules
 *.pem
+circom/build/*
