@@ -16,21 +16,13 @@ fn main() {
     let message_bytes: [u8; 5] = [1, 2, 3, 4, 5];
     // let tkp = ThresholdKeyPairs::new(N, T);
 
-    // test one sk rotation
-    let pr1 = ProactiveRefresh::new(N, T);
-    let sk_old = pr1.tkp.keys[0].x;
-    println!("single old sk: {:?}", sk_old);
-    let sk_new = pr1.update_one(sk_old);
-    println!("single new sk: {:?}", sk_new);
-
-
     // test all sk rotation
     let mut pr2:ProactiveRefresh = ProactiveRefresh::new(N, T);
-    println!("all old aggregate: {:?}", pr2.tkp.quorum_X(&QUORUM.to_vec()));
-    println!("all old sk: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
-    pr2.update_all();
-    println!("all new aggregate: {:?}", pr2.tkp.quorum_X(&QUORUM.to_vec()));
-    println!("all new sk: {:?}", pr2.tkp.get_x(&QUORUM.to_vec())); 
+    println!("all old aggregate: {:?}", pr2.tkp.quorum_x(&QUORUM.to_vec()));
+    println!("all old sks: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
+    pr2.refresh_all();
+    println!("all new aggregate: {:?}", pr2.tkp.quorum_x(&QUORUM.to_vec()));
+    println!("all new sks: {:?}", pr2.tkp.get_x(&QUORUM.to_vec())); 
 
     println!("=== ATS");
 
