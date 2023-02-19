@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 ff-zeroize = "0.6.3"
 pairing-plus = "0.19"
+serde_json = "1.0.93"
 
 [dependencies.curv]
 git = "https://github.com/ZenGo-X/curv"
