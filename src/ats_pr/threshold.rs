@@ -6,8 +6,8 @@ use crate::ats_pr::lagrange::{
 #[derive(Debug)]
 pub struct ThresholdKeyPairs {
     pub keys: Vec<KeyPairG2>,
-    n: usize,
-    t: usize,
+    pub n: usize,
+    pub t: usize,
 }
 
 #[derive(Debug)]
