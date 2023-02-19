@@ -10,8 +10,8 @@ use curv::BigInt;
 #[derive(Debug)]
 pub struct ThresholdKeyPairs {
     pub keys: Vec<KeyPairG2>,
-    n: usize,
-    t: usize 
+    pub n: usize,
+    pub t: usize
 }
 
 impl ThresholdKeyPairs {
