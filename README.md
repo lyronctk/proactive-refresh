@@ -1,6 +1,6 @@
 # Proactive Refresh for BLS Threshold Signatures 
 
-Based on work by [Boneh, Partap, and Rotem](https://eprint.iacr.org/2022/1656.pdf). 
+Based on ["Proactive Refresh for Accountable Threshold Signatures" by D Boneh, A Partap, L Rotem](https://eprint.iacr.org/2022/1656.pdf). 
 
 ## Motivation 
 Threshold signatures secure billions in assets across crypto and traditional finance. They're meant to increase vault security by splitting up a digital signature across N parties, requiring at least T of them to sign off before any action (e.g. "liquidate funds" or "pay contractor") is taken. Though adversaries now need to compromise at least T parties to exploit, vanilla schemes come with a significant drawback. Signature shares are stagnant, so adversaries can target the T parties over the course of months, eventually resulting in a hack regardless of the threshold parameter. 
