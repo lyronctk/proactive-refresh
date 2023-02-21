@@ -1,10 +1,12 @@
-use crate::ats_pr::bls::FE1;
-use crate::ats_pr::bls::FE2;
+#![allow(non_snake_case)]
+
+use crate::bls::FE2;
+use crate::threshold::ThresholdKeyPairs;
 
 use curv::elliptic::curves::traits::ECScalar;
 use curv::BigInt;
 
-use super::threshold::ThresholdKeyPairs;
+use std::fmt; 
 
 #[derive(Debug)]
 pub struct ProactiveRefresh {
@@ -29,7 +31,7 @@ impl ProactiveRefresh {
         
         // generate gammas
         for i in 0..self.tkp.keys.len() {
-            self.gammas[i] = self.update_0(self.tkp.keys[i].x);
+            self.gammas[i] = self.update_0();
         }
         // update secret keys
         for j in 0..self.tkp.keys.len() {
@@ -38,7 +40,7 @@ impl ProactiveRefresh {
     }
 
     // producing gamma [i, 1], sends f_i(j) to signer j
-    pub fn update_0(&self, sk: FE2) -> Vec<FE2> {
+    pub fn update_0(&self) -> Vec<FE2> {
         let t: usize = self.tkp.t;
         let n: usize = self.tkp.n;
 
@@ -71,4 +73,8 @@ impl ProactiveRefresh {
         }
         return sk + gamma_sum
     }
+}
+
+impl fmt::Display for ProactiveRefresh {
+    fn fmt(&self, f: )
 }

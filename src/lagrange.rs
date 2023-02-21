@@ -1,11 +1,13 @@
-use crate::ats_pr::bls::{ECPoint, ECScalar, FE1, FE2, GE1, GE2};
+#![allow(non_snake_case)]
+
+use crate::bls::{ECPoint, ECScalar, FE1, FE2, GE1, GE2};
 
 use curv::BigInt;
 
 pub fn lagrange_coeff_f0<T>(points: &Vec<(usize, T)>, j: usize) -> FE2 {
     let fe2_xj: FE2 = ECScalar::from(&BigInt::from(points[j].0 as u32));
     let mut prod: FE2 = ECScalar::from(&BigInt::from(1));
-    for (i, pi) in points.iter().enumerate() {
+    for (i, _) in points.iter().enumerate() {
         if i == j {
             continue;
         }

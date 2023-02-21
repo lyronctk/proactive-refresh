@@ -1,5 +1,7 @@
-use crate::ats_pr::bls::{BLSSignature, ECPoint, ECScalar, KeyPairG2, FE1, FE2, GE1, GE2};
-use crate::ats_pr::lagrange::{
+#![allow(non_snake_case)]
+
+use crate::bls::{BLSSignature, KeyPairG2, FE2, GE1, GE2};
+use crate::lagrange::{
     lagrange_interpolate_f0_X, lagrange_interpolate_f0_sig, lagrange_interpolate_f0_x,
 };
 
@@ -19,7 +21,7 @@ pub struct ThresholdSignature {
 impl ThresholdKeyPairs {
     pub fn new(_n: usize, _t: usize) -> Self {
         let mut k: Vec<KeyPairG2> = Vec::new();
-        for i in 0.._n {
+        for _ in 0.._n {
             k.push(KeyPairG2::new());
         }
         Self {

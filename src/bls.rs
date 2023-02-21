@@ -1,4 +1,5 @@
 // inspired by https://github.com/ZenGo-X/multi-party-bls/blob/main/src/basic_bls.rs
+#![allow(non_snake_case)]
 
 use std::ops::Add;
 

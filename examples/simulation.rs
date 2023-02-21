@@ -1,7 +1,4 @@
-mod ats_pr;
-
-use ats_pr::pr::ProactiveRefresh;
-use ats_pr::threshold::{ThresholdKeyPairs, ThresholdSignature};
+use proactive_refresh::pr::ProactiveRefresh;
 
 use curv::arithmetic::Converter;
 use curv::elliptic::curves::traits::ECScalar;
@@ -30,14 +27,14 @@ fn format_pkx(committee: &ProactiveRefresh) -> Vec<String> {
 }
 
 fn main() {
-    let mut committee: ProactiveRefresh = ProactiveRefresh::new(N, T);
+    let committee: ProactiveRefresh = ProactiveRefresh::new(N, T);
     let mut committee_pr: ProactiveRefresh = ProactiveRefresh::new(N, T);
 
     let mut secure: Vec<bool> = vec![true; N];
     let mut secure_pr: Vec<bool> = vec![true; N];
 
     let mut is_breached = false;
-    let mut is_breached_pr = false;
+    let is_breached_pr = false;
 
     let mut breach_ctr = 0; 
     let mut epochs = Vec::new();
@@ -91,28 +88,4 @@ fn main() {
         committee_pr.refresh_all();
     }
     serde_json::to_writer(&File::create(OUT_FILE).unwrap(), &epochs).unwrap();
-
-    // println!("=== PR");
-    // let tkp = ThresholdKeyPairs::new(N, T);
-    // let message_bytes: [u8; 5] = [1, 2, 3, 4, 5];
-    // // let tkp = ThresholdKeyPairs::new(N, T);
-
-    // // test all sk rotation
-    // let mut pr2:ProactiveRefresh = ProactiveRefresh::new(N, T);
-    // println!("all old aggregate: {:?}", pr2.tkp.quorum_x(&QUORUM.to_vec()));
-    // println!("all old sks: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
-    // pr2.refresh_all();
-    // println!("all new aggregate: {:?}", pr2.tkp.quorum_x(&QUORUM.to_vec()));
-    // println!("all new sks: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
-
-    // println!("=== ATS");
-    // let mut sig: ThresholdSignature =
-    //     ThresholdSignature::sign(&message_bytes[..], &tkp, &QUORUM.to_vec());
-    // println!("signature: {:?}", sig);
-
-    // let adversarial_quorum = QUORUM.to_vec();
-    // println!("for correct quorum: {}", sig.verify(&message_bytes[..], &tkp));
-
-    // sig.quorum = vec![1, 4];
-    // println!("for adversarial quorum: {}", sig.verify(&message_bytes[..], &tkp));
 }
