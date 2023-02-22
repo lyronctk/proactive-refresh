@@ -33,6 +33,13 @@ impl ThresholdKeyPairs {
         }
     }
 
+    pub fn getParty(&self, idx: usize) -> KeyPairG2 {
+        if idx - 1 >= self.keys.len() {
+            panic!("Tried to access key at idx > n");
+        }
+        self.keys[idx - 1]
+    }
+
     fn get_quorum_keys(&self, quorum: &Vec<usize>) -> Vec<&KeyPairG2> {
         let mut q: Vec<&KeyPairG2> = Vec::new();
         for idx in quorum {

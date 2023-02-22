@@ -1,4 +1,4 @@
-use proactive_refresh::{pr::ProactiveRefresh, threshold::ThresholdSignature};
+use proactive_refresh::{bls::KeyPairG2, pr::ProactiveRefresh, threshold::ThresholdSignature};
 
 const T: usize = 5;
 const N: usize = 7;
@@ -12,6 +12,11 @@ fn main() {
     let sig1: ThresholdSignature =
         ThresholdSignature::sign(&MESSAGE_BYTES[..], &parties.getKeys(), &QUORUM.to_vec());
 
+    // Pretend that adversary compromises keys for party 1 & 5 
+    let stolen1: KeyPairG2 = parties.getKeys().getParty(1);
+    let stolen5: KeyPairG2 = parties.getKeys().getParty(5);
+
+    // Run refresh protocol a few times
     for i in 0..=REFRESH_COUNT {
         println!("== Refresh {}", i);
         parties.refresh_all();
@@ -24,11 +29,23 @@ fn main() {
         println!("==");
     }
 
-    // Demonstrate threshold public key unchanged 
+    // Demonstrate threshold public key unchanged
     println!("== Signature signed before refresh still validates");
-    println!("- {}", sig1);
-    println!("- {}", sig1.verify(&MESSAGE_BYTES[..], parties.getKeys()));
-    println!("==")
+    println!(
+        "- {} validates? {}",
+        sig1,
+        sig1.verify(&MESSAGE_BYTES[..], parties.getKeys())
+    );
+    println!("==");
+
+    // Demonstrate that collective signature of quorum unchanged
+    println!("== Signature from before refresh same as after");
+    println!("- Before: {}", sig1);
+    println!(
+        "- After: {}",
+        ThresholdSignature::sign(&MESSAGE_BYTES[..], &parties.getKeys(), &QUORUM.to_vec())
+    );
+    println!("==");
 
     // println!(
     //     "all old aggregate: {:?}",
