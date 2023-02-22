@@ -84,7 +84,10 @@ impl fmt::Display for ThresholdKeyPairs {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Private keys for {}-of-{}\n", self.t, self.n)?;
         for (i, k) in self.keys.iter().enumerate() {
-            write!(f, "  [{}] {}\n", i.to_string(), k)?;
+            write!(f, "  [{}] {}", i.to_string(), k)?;
+            if i != self.keys.len() - 1 {
+                write!(f, "\n")?;
+            }
         }
         Ok(())
     }
@@ -113,5 +116,11 @@ impl ThresholdSignature {
         }
         let X: GE2 = tkps.quorum_X(&self.quorum);
         return self.sig.verify(message, &X);
+    }
+}
+
+impl fmt::Display for ThresholdSignature {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "(sigma: {}, quorum: {:?})", self.sig, self.quorum)
     }
 }

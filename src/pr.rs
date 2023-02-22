@@ -10,8 +10,8 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct ProactiveRefresh {
-    pub tkp: ThresholdKeyPairs,
-    pub gammas: Vec<Vec<FE2>> 
+    tkp: ThresholdKeyPairs,
+    gammas: Vec<Vec<FE2>> 
 }
 
 impl ProactiveRefresh {
@@ -24,6 +24,10 @@ impl ProactiveRefresh {
             tkp: ThresholdKeyPairs::new(_n, _t),
             gammas: g
         }
+    }
+
+    pub fn getKeys(&self) -> &ThresholdKeyPairs {
+        &self.tkp
     }
 
     /* update all sk part of threshold keypairs */

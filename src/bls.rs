@@ -64,3 +64,9 @@ impl BLSSignature {
         lhs == rhs
     }
 }
+
+impl fmt::Display for BLSSignature {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.sigma)
+    }
+}
