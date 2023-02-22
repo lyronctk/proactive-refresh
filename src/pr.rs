@@ -76,5 +76,7 @@ impl ProactiveRefresh {
 }
 
 impl fmt::Display for ProactiveRefresh {
-    fn fmt(&self, f: )
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.tkp)
+    }
 }

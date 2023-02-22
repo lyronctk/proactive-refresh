@@ -1,8 +1,7 @@
 // inspired by https://github.com/ZenGo-X/multi-party-bls/blob/main/src/basic_bls.rs
 #![allow(non_snake_case)]
 
-use std::ops::Add;
-
+use curv::arithmetic::Converter;
 pub use curv::elliptic::curves::bls12_381::{
     g1::FE as FE1,
     g1::GE as GE1,
@@ -11,6 +10,9 @@ pub use curv::elliptic::curves::bls12_381::{
     Pair,
 };
 pub use curv::elliptic::curves::traits::{ECPoint, ECScalar};
+
+use std::ops::Add;
+use std::fmt;
 
 #[derive(Clone, Copy, Debug)]
 pub struct KeyPairG2 {
@@ -28,6 +30,12 @@ impl KeyPairG2 {
         let x: FE2 = ECScalar::new_random();
         let X: GE2 = GE2::generator() * &x;
         KeyPairG2 { x, X }
+    }
+}
+
+impl fmt::Display for KeyPairG2 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "0x{}", self.x.to_big_int().to_str_radix(16))
     }
 }
 

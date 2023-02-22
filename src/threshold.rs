@@ -5,6 +5,8 @@ use crate::lagrange::{
     lagrange_interpolate_f0_X, lagrange_interpolate_f0_sig, lagrange_interpolate_f0_x,
 };
 
+use std::fmt;
+
 #[derive(Debug)]
 pub struct ThresholdKeyPairs {
     pub keys: Vec<KeyPairG2>,
@@ -75,6 +77,16 @@ impl ThresholdKeyPairs {
                 .zip(self.get_x(&quorum).into_iter())
                 .collect(),
         )
+    }
+}
+
+impl fmt::Display for ThresholdKeyPairs {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Private keys for {}-of-{}\n", self.t, self.n)?;
+        for (i, k) in self.keys.iter().enumerate() {
+            write!(f, "  [{}] {}\n", i.to_string(), k)?;
+        }
+        Ok(())
     }
 }
 
