@@ -1,4 +1,7 @@
-use proactive_refresh::{bls::KeyPairG2, pr::ProactiveRefresh, threshold::ThresholdSignature};
+use proactive_refresh::{
+    bls::KeyPairG2, pr::ProactiveRefresh, threshold::ThresholdKeyPairs,
+    threshold::ThresholdSignature,
+};
 
 const T: usize = 5;
 const N: usize = 7;
@@ -12,7 +15,7 @@ fn main() {
     let sig1: ThresholdSignature =
         ThresholdSignature::sign(&MESSAGE_BYTES[..], &parties.getKeys(), &QUORUM.to_vec());
 
-    // Pretend that adversary compromises keys for party 1 & 5 
+    // Pretend that adversary compromises keys for party 1 & 5
     let stolen1: KeyPairG2 = parties.getKeys().getParty(1);
     let stolen5: KeyPairG2 = parties.getKeys().getParty(5);
 
@@ -47,27 +50,22 @@ fn main() {
     );
     println!("==");
 
-    // println!(
-    //     "all old aggregate: {:?}",
-    //     pr2.tkp.quorum_x(&QUORUM.to_vec())
-    // );
-    // println!("all old sks: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
-    // pr2.refresh_all();
-    // println!(
-    //     "all new aggregate: {:?}",
-    //     pr2.tkp.quorum_x(&QUORUM.to_vec())
-    // );
-    // println!("all new sks: {:?}", pr2.tkp.get_x(&QUORUM.to_vec()));
-
-    // let adversarial_quorum = QUORUM.to_vec();
-    // println!(
-    //     "for correct quorum: {}",
-    //     sig.verify(&message_bytes[..], &tkp)
-    // );
-
-    // sig.quorum = vec![1, 4];
-    // println!(
-    //     "for adversarial quorum: {}",
-    //     sig.verify(&message_bytes[..], &tkp)
-    // );
+    // Demonstrate that keys from different refresh intervals cannot be
+    // combined to create a valid signature under the same public key
+    println!("== Stolen keys from different rounds don't validate");
+    let advers_recon: ThresholdKeyPairs = ThresholdKeyPairs::from(
+        vec![
+            stolen1,
+            parties.getKeys().getParty(2),
+            parties.getKeys().getParty(3),
+            parties.getKeys().getParty(4),
+            stolen5,
+            parties.getKeys().getParty(6),
+            parties.getKeys().getParty(7),
+        ],
+        T,
+    );
+    let sig2: ThresholdSignature = ThresholdSignature::sign(&MESSAGE_BYTES[..], &advers_recon, &QUORUM.to_vec());
+    println!("{}", sig2.verify(&MESSAGE_BYTES[..], &parties.getKeys()));
+    println!("==");
 }

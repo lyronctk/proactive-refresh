@@ -33,6 +33,14 @@ impl ThresholdKeyPairs {
         }
     }
 
+    pub fn from(ks: Vec<KeyPairG2>, _t: usize) -> Self {
+        Self {
+            n: ks.len(),
+            t: _t,
+            keys: ks, 
+        }
+    }
+
     pub fn getParty(&self, idx: usize) -> KeyPairG2 {
         if idx - 1 >= self.keys.len() {
             panic!("Tried to access key at idx > n");
