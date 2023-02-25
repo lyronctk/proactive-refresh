@@ -1,3 +1,7 @@
+/*
+ * Basic example of using proactive refresh on BLS threshold signatures. Goes
+ * through generating the keys, refreshing shares, and signing messages.
+ */
 use proactive_refresh::{
     bls::KeyPairG2, pr::ProactiveRefresh, threshold::ThresholdKeyPairs,
     threshold::ThresholdSignature,
@@ -34,9 +38,9 @@ fn main() {
 
     // Demonstrate threshold public key unchanged
     println!("== Signature signed before refresh still validates");
+    println!("- {}", sig1);
     println!(
-        "- {} validates? {}",
-        sig1,
+        "- validates? {}",
         sig1.verify(&MESSAGE_BYTES[..], parties.getKeys())
     );
     println!("==");
@@ -52,7 +56,7 @@ fn main() {
 
     // Demonstrate that keys from different refresh intervals cannot be
     // combined to create a valid signature under the same public key
-    println!("== Stolen keys from different rounds don't validate");
+    println!("== Stolen keys from diff rounds don't create valid signatures");
     let advers_recon: ThresholdKeyPairs = ThresholdKeyPairs::from(
         vec![
             stolen1,
@@ -65,7 +69,11 @@ fn main() {
         ],
         T,
     );
-    let sig2: ThresholdSignature = ThresholdSignature::sign(&MESSAGE_BYTES[..], &advers_recon, &QUORUM.to_vec());
-    println!("{}", sig2.verify(&MESSAGE_BYTES[..], &parties.getKeys()));
+    let sig2: ThresholdSignature =
+        ThresholdSignature::sign(&MESSAGE_BYTES[..], &advers_recon, &QUORUM.to_vec());
+    println!(
+        "- validates? {}",
+        sig2.verify(&MESSAGE_BYTES[..], &parties.getKeys())
+    );
     println!("==");
 }
