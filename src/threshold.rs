@@ -1,4 +1,4 @@
-use crate::bls::{BLSSignature, KeyPairG2, GE1, GE2};
+use crate::bls::{BLSSignature, KeyPairG2, FE2, GE1, GE2};
 use crate::lagrange::{
     lagrange_interpolate_f0,
 };
@@ -6,15 +6,15 @@ use std::fmt;
 
 #[derive(Debug)]
 pub struct ThresholdKeyPairs {
-    pub keys: Vec<KeyPairG2>,
-    pub n: usize,
-    pub t: usize,
+    keys: Vec<KeyPairG2>,
+    n: usize,
+    t: usize,
 }
 
 #[derive(Debug)]
 pub struct ThresholdSignature {
     sig: BLSSignature,
-    pub quorum: Vec<usize>
+    quorum: Vec<usize>
 }
 
 impl ThresholdKeyPairs {
@@ -38,8 +38,12 @@ impl ThresholdKeyPairs {
         }
     }
 
+    /*
+     * Getter for keypair of party idx. Note that parties 
+     * are 1-indexed. 
+     */
     pub fn get(&self, idx: usize) -> &KeyPairG2 {
-        if idx - 1 >= self.keys.len() {
+        if idx > self.keys.len() {
             panic!("Tried to access key at idx > n");
         }
         &self.keys[idx - 1]
@@ -71,6 +75,25 @@ impl ThresholdKeyPairs {
                 .zip(self.get_pubs(&quorum).into_iter())
                 .collect(),
         )
+    }
+
+    pub fn n_keys(&self) -> usize {
+        self.keys.len()
+    }
+
+    pub fn update_secret(&mut self, j: usize, upd: FE2) {
+        if j > self.keys.len() {
+            panic!("Tried to update key at idx > n");
+        }
+        self.keys[j - 1].update_secret(upd);
+    }
+
+    pub fn t(&self) -> usize {
+        self.t
+    }
+
+    pub fn n(&self) -> usize {
+        self.n
     }
 }
 
