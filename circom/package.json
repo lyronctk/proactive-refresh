@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "cd scripts && ./build_signature.sh",
+    "build:dummy": "cd scripts && ./build_dummy.sh",
     "circom:dev": "hardhat circom --deterministic --debug --verbose",
     "circom:prod": "hardhat circom --verbose"
   },
