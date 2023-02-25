@@ -1,4 +1,7 @@
-// inspired by https://github.com/ZenGo-X/multi-party-bls/blob/main/src/basic_bls.rs
+/*
+ * BLS keypairs and signatures. Inspired by 
+ * https://github.com/ZenGo-X/multi-party-bls/blob/main/src/basic_bls.rs
+ */
 #![allow(non_snake_case)]
 
 use curv::arithmetic::Converter;
@@ -26,20 +29,33 @@ pub struct BLSSignature {
 }
 
 impl KeyPairG2 {
+    /*
+     * Generate new key pair.
+     */
     pub fn new() -> Self {
         let x: FE2 = ECScalar::new_random();
         let X: GE2 = GE2::generator() * &x;
         KeyPairG2 { x, X }
     }
 
+    /*
+     * Getter for public key.
+     */
     pub fn pub_key(&self) -> GE2 {
         self.X
     } 
 
+    /*
+     * Getter for private key.
+     */
     pub fn priv_key(&self) -> FE2 {
         self.x
     } 
 
+    /*
+     * Update private key. Departure from regular BLS key pairs since it breaks 
+     * the invariant G * priv = pub. 
+     */
     pub fn update_secret(&mut self, upd: FE2) {
         self.x = upd;
     }
@@ -63,16 +79,25 @@ impl Add for KeyPairG2 {
 }
 
 impl BLSSignature {
+    /*
+     * Instance from group element. 
+     */
     pub fn from(s: GE1) -> Self {
         BLSSignature { sigma: s }
     }
 
+    /*
+     * Sign message using private key. 
+     */
     pub fn sign(message: &[u8], x: &FE2) -> Self {
         let H_m: GE1 = GE1::hash_to_curve(message);
         let fe1_x: FE1 = ECScalar::from(&ECScalar::to_big_int(x));
         BLSSignature { sigma: H_m * fe1_x }
     }
 
+    /*
+     * Verify that signature is valid under a given public key and message pair.
+     */
     pub fn verify(&self, message: &[u8], X: &GE2) -> bool {
         let H_m: GE1 = GE1::hash_to_curve(message);
         let lhs: Pair = Pair::compute_pairing(&H_m, X);

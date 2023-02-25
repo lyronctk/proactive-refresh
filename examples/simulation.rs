@@ -1,8 +1,8 @@
-use proactive_refresh::bls::ECPoint;
 /*
  * Simulates a long-term adversarial attack on threshold signatures with and
  * without proactive refresh. Done for demo purposes.
  */
+use proactive_refresh::bls::ECPoint;
 use proactive_refresh::pr::ProactiveRefresh;
 
 use curv::{arithmetic::Converter, elliptic::curves::traits::ECScalar};

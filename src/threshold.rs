@@ -1,3 +1,6 @@
+/*
+ * Accountable BLS threshold signatures. 
+ */
 use crate::bls::{BLSSignature, KeyPairG2, FE2, GE1, GE2};
 use crate::lagrange::{
     lagrange_interpolate_f0,
@@ -18,6 +21,10 @@ pub struct ThresholdSignature {
 }
 
 impl ThresholdKeyPairs {
+    /*
+     * Instantiates a threshold scheme by sampling _n new key pairs and saving
+     * threshold param _t. 
+     */
     pub fn new(_n: usize, _t: usize) -> Self {
         let mut k: Vec<KeyPairG2> = Vec::new();
         for _ in 0.._n {
@@ -30,6 +37,9 @@ impl ThresholdKeyPairs {
         }
     }
 
+    /*
+     * Constructs object from key pairs & a threshold. 
+     */
     pub fn from(ks: Vec<KeyPairG2>, _t: usize) -> Self {
         Self {
             n: ks.len(),
@@ -39,7 +49,7 @@ impl ThresholdKeyPairs {
     }
 
     /*
-     * Getter for keypair of party at idx. 
+     * Getter for key pair of party at idx. 
      */
     pub fn get(&self, idx: usize) -> &KeyPairG2 {
         if idx >= self.keys.len() {
@@ -48,6 +58,9 @@ impl ThresholdKeyPairs {
         &self.keys[idx]
     }
 
+    /*
+     * Getter for key pairs of a given quorum. 
+     */
     pub fn get_quorum_keys(&self, quorum: &Vec<usize>) -> Vec<&KeyPairG2> {
         let mut q: Vec<&KeyPairG2> = Vec::new();
         for idx in quorum {
@@ -59,6 +72,9 @@ impl ThresholdKeyPairs {
         q
     }
 
+    /*
+     * Getter for public keys of a given quorum. 
+     */
     fn get_pubs(&self, quorum: &Vec<usize>) -> Vec<GE2> {
         self.get_quorum_keys(quorum)
             .into_iter()
@@ -66,6 +82,12 @@ impl ThresholdKeyPairs {
             .collect()
     }
 
+    /*
+     * Computes collective public key of a given quorum via lagrange 
+     * interpolation. Returns f(0) of the lowest degree polynomial that passes
+     * through the points {(party_idx, party_pubkey)} for all parties in the 
+     * quorum.
+     */
     pub fn collective_pub(&self, quorum: &Vec<usize>) -> GE2 {
         lagrange_interpolate_f0(
             &quorum
@@ -76,10 +98,9 @@ impl ThresholdKeyPairs {
         )
     }
 
-    pub fn n_keys(&self) -> usize {
-        self.keys.len()
-    }
-
+    /*
+     * Update the secret key of the jth party. 
+     */
     pub fn update_secret(&mut self, j: usize, upd: FE2) {
         if j >= self.keys.len() {
             panic!("Tried to update key at idx >= n");
@@ -87,10 +108,16 @@ impl ThresholdKeyPairs {
         self.keys[j].update_secret(upd);
     }
 
+    /*
+     * Threshold param. 
+     */
     pub fn t(&self) -> usize {
         self.t
     }
 
+    /*
+     * Number of parties. 
+     */
     pub fn n(&self) -> usize {
         self.n
     }
@@ -110,6 +137,12 @@ impl fmt::Display for ThresholdKeyPairs {
 }
 
 impl ThresholdSignature {
+    /*
+     * Creates signature shares for each party in the quorum. Collective 
+     * signature is f(0) for the lowest degree polynomial passing through the
+     * sig shares. See ThresholdKeyPairs::collective_pub() for an analogous 
+     * computation.
+     */
     pub fn sign(message: &[u8], tkps: &ThresholdKeyPairs, quorum: &Vec<usize>) -> Self {
         let mut sigmas: Vec<GE1> = Vec::new();
         for key in tkps.get_quorum_keys(quorum) {
@@ -125,6 +158,10 @@ impl ThresholdSignature {
         ThresholdSignature { sig: BLSSignature::from(sigma), quorum: quorum.clone() }
     }
 
+    /*
+     * Signature is valid if it is 1) signed by t parties and 2) verifies 
+     * under the quorum's collective public key. 
+     */
     pub fn verify(&self, message: &[u8], tkps: &ThresholdKeyPairs) -> bool {
         if self.quorum.len() < tkps.t {
             println!("- Verification failed. Quorum has fewer than t participants.");
