@@ -36,10 +36,10 @@ impl ProactiveRefresh {
         }
         let mut updated_keys: Vec<FE2> = Vec::new();
         for j in 0..self.tkp.n_keys() {
-            updated_keys.push(self.update_1(self.tkp.get(j + 1).priv_key(), j));
+            updated_keys.push(self.update_1(self.tkp.get(j).priv_key(), j));
         }
         for j in 0..self.tkp.n_keys() {
-            self.tkp.update_secret(j + 1, updated_keys[j]);
+            self.tkp.update_secret(j, updated_keys[j]);
         }
     }
 

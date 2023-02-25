@@ -1,3 +1,4 @@
+use proactive_refresh::bls::ECPoint;
 /*
  * Simulates a long-term adversarial attack on threshold signatures with and
  * without proactive refresh. Done for demo purposes.
@@ -21,10 +22,10 @@ const OUT_FILE: &str = "./out/sim.json";
 fn format_pkx(committee: &ProactiveRefresh) -> Vec<String> {
     Vec::from_iter(
         committee
-            .getKeys()
-            .get_x(&Vec::from_iter(0..N))
+            .threshold_keys()
+            .get_quorum_keys(&Vec::from_iter(0..N))
             .into_iter()
-            .map(|x| "0x".to_string() + &x.to_big_int().to_str_radix(16)),
+            .map(|kp| "0x".to_string() + &kp.priv_key().to_big_int().to_str_radix(16)),
     )
 }
 
@@ -56,7 +57,10 @@ fn main() {
             hm.insert("secure", secure[j].to_string());
             pk_status.push(hm);
         }
-        let cx = ECScalar::to_big_int(&committee.getKeys().quorum_x(&QUORUM.to_vec()));
+        let cx = &committee
+            .threshold_keys()
+            .collective_pub(&QUORUM.to_vec())
+            .bytes_compressed_to_big_int();
 
         let mut pk_status_pr = Vec::new();
         for (j, pkx) in format_pkx(&committee_pr).iter().enumerate() {
@@ -65,7 +69,10 @@ fn main() {
             hm.insert("secure", secure_pr[j].to_string());
             pk_status_pr.push(hm);
         }
-        let cx_pr = ECScalar::to_big_int(&committee_pr.getKeys().quorum_x(&QUORUM.to_vec()));
+        let cx_pr = &committee_pr
+            .threshold_keys()
+            .collective_pub(&QUORUM.to_vec())
+            .bytes_compressed_to_big_int();
 
         let epoch_json = json!({
             "time": i,

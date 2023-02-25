@@ -39,20 +39,19 @@ impl ThresholdKeyPairs {
     }
 
     /*
-     * Getter for keypair of party idx. Note that parties 
-     * are 1-indexed. 
+     * Getter for keypair of party at idx. 
      */
     pub fn get(&self, idx: usize) -> &KeyPairG2 {
-        if idx > self.keys.len() {
-            panic!("Tried to access key at idx > n");
+        if idx >= self.keys.len() {
+            panic!("Tried to access key at idx >= n");
         }
-        &self.keys[idx - 1]
+        &self.keys[idx]
     }
 
-    fn get_quorum_keys(&self, quorum: &Vec<usize>) -> Vec<&KeyPairG2> {
+    pub fn get_quorum_keys(&self, quorum: &Vec<usize>) -> Vec<&KeyPairG2> {
         let mut q: Vec<&KeyPairG2> = Vec::new();
         for idx in quorum {
-            if *idx >= self.keys.len() {
+            if *idx > self.keys.len() {
                 panic!("Quorum indices included party outside of available keys");
             }
             q.push(&self.keys[*idx]);
@@ -82,10 +81,10 @@ impl ThresholdKeyPairs {
     }
 
     pub fn update_secret(&mut self, j: usize, upd: FE2) {
-        if j > self.keys.len() {
-            panic!("Tried to update key at idx > n");
+        if j >= self.keys.len() {
+            panic!("Tried to update key at idx >= n");
         }
-        self.keys[j - 1].update_secret(upd);
+        self.keys[j].update_secret(upd);
     }
 
     pub fn t(&self) -> usize {
