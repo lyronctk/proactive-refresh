@@ -16,13 +16,13 @@ use std::fmt;
 
 #[derive(Clone, Copy, Debug)]
 pub struct KeyPairG2 {
-    pub X: GE2,
-    pub x: FE2,
+    X: GE2,
+    x: FE2,
 }
 
 #[derive(Debug)]
 pub struct BLSSignature {
-    pub sigma: GE1,
+    sigma: GE1,
 }
 
 impl KeyPairG2 {
@@ -30,6 +30,18 @@ impl KeyPairG2 {
         let x: FE2 = ECScalar::new_random();
         let X: GE2 = GE2::generator() * &x;
         KeyPairG2 { x, X }
+    }
+
+    pub fn pub_key(&self) -> GE2 {
+        self.X
+    } 
+
+    pub fn priv_key(&self) -> FE2 {
+        self.x
+    } 
+
+    pub fn update_secret(&mut self, upd: FE2) {
+        self.x = upd;
     }
 }
 
@@ -51,6 +63,10 @@ impl Add for KeyPairG2 {
 }
 
 impl BLSSignature {
+    pub fn from(s: GE1) -> Self {
+        BLSSignature { sigma: s }
+    }
+
     pub fn sign(message: &[u8], x: &FE2) -> Self {
         let H_m: GE1 = GE1::hash_to_curve(message);
         let fe1_x: FE1 = ECScalar::from(&ECScalar::to_big_int(x));
@@ -62,6 +78,10 @@ impl BLSSignature {
         let lhs: Pair = Pair::compute_pairing(&H_m, X);
         let rhs: Pair = Pair::compute_pairing(&self.sigma, &GE2::generator());
         lhs == rhs
+    }
+
+    pub fn sigma(&self) -> GE1 {
+        self.sigma
     }
 }
 

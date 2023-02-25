@@ -1,10 +1,7 @@
-#![allow(non_snake_case)]
-
-use crate::bls::{BLSSignature, KeyPairG2, FE2, GE1, GE2};
+use crate::bls::{BLSSignature, KeyPairG2, GE1, GE2};
 use crate::lagrange::{
     lagrange_interpolate_f0,
 };
-
 use std::fmt;
 
 #[derive(Debug)]
@@ -41,11 +38,11 @@ impl ThresholdKeyPairs {
         }
     }
 
-    pub fn getParty(&self, idx: usize) -> KeyPairG2 {
+    pub fn get(&self, idx: usize) -> &KeyPairG2 {
         if idx - 1 >= self.keys.len() {
             panic!("Tried to access key at idx > n");
         }
-        self.keys[idx - 1]
+        &self.keys[idx - 1]
     }
 
     fn get_quorum_keys(&self, quorum: &Vec<usize>) -> Vec<&KeyPairG2> {
@@ -59,27 +56,19 @@ impl ThresholdKeyPairs {
         q
     }
 
-    // [TODO] Convert functions below for generics that accept GE2 or FE2
-    pub fn get_X(&self, quorum: &Vec<usize>) -> Vec<GE2> {
+    fn get_pubs(&self, quorum: &Vec<usize>) -> Vec<GE2> {
         self.get_quorum_keys(quorum)
             .into_iter()
-            .map(|key: &KeyPairG2| key.X)
+            .map(|key: &KeyPairG2| key.pub_key())
             .collect()
     }
 
-    pub fn get_x(&self, quorum: &Vec<usize>) -> Vec<FE2> {
-        self.get_quorum_keys(quorum)
-            .into_iter()
-            .map(|key: &KeyPairG2| key.x)
-            .collect()
-    }
-
-    pub fn quorum_X(&self, quorum: &Vec<usize>) -> GE2 {
+    pub fn collective_pub(&self, quorum: &Vec<usize>) -> GE2 {
         lagrange_interpolate_f0(
             &quorum
                 .into_iter()
                 .map(|idx: &usize| idx + 1)
-                .zip(self.get_X(&quorum).into_iter())
+                .zip(self.get_pubs(&quorum).into_iter())
                 .collect(),
         )
     }
@@ -101,8 +90,8 @@ impl fmt::Display for ThresholdKeyPairs {
 impl ThresholdSignature {
     pub fn sign(message: &[u8], tkps: &ThresholdKeyPairs, quorum: &Vec<usize>) -> Self {
         let mut sigmas: Vec<GE1> = Vec::new();
-        for x in tkps.get_x(quorum) {
-            sigmas.push(BLSSignature::sign(message, &x).sigma);
+        for key in tkps.get_quorum_keys(quorum) {
+            sigmas.push(BLSSignature::sign(message, &key.priv_key()).sigma())
         }
         let sigma = lagrange_interpolate_f0(
             &quorum
@@ -111,7 +100,7 @@ impl ThresholdSignature {
                 .zip(sigmas.into_iter())
                 .collect(),
         );
-        ThresholdSignature { sig: BLSSignature { sigma: sigma }, quorum: quorum.clone() }
+        ThresholdSignature { sig: BLSSignature::from(sigma), quorum: quorum.clone() }
     }
 
     pub fn verify(&self, message: &[u8], tkps: &ThresholdKeyPairs) -> bool {
@@ -119,8 +108,7 @@ impl ThresholdSignature {
             println!("- Verification failed. Quorum has fewer than t participants.");
             return false;
         }
-        let X: GE2 = tkps.quorum_X(&self.quorum);
-        return self.sig.verify(message, &X);
+        return self.sig.verify(message, &tkps.collective_pub(&self.quorum));
     }
 }
 

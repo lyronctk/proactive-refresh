@@ -17,11 +17,11 @@ fn main() {
     let mut parties: ProactiveRefresh = ProactiveRefresh::new(N, T);
 
     let sig1: ThresholdSignature =
-        ThresholdSignature::sign(&MESSAGE_BYTES[..], &parties.getKeys(), &QUORUM.to_vec());
+        ThresholdSignature::sign(&MESSAGE_BYTES[..], &parties.threshold_keys(), &QUORUM.to_vec());
 
     // Pretend that adversary compromises keys for party 1 & 5
-    let stolen1: KeyPairG2 = parties.getKeys().getParty(1);
-    let stolen5: KeyPairG2 = parties.getKeys().getParty(5);
+    let stolen1: KeyPairG2 = parties.threshold_keys().get(1).clone();
+    let stolen5: KeyPairG2 = parties.threshold_keys().get(5).clone();
 
     // Run refresh protocol a few times
     for i in 0..=REFRESH_COUNT {
@@ -31,7 +31,7 @@ fn main() {
         println!(
             "- Collective pubkey for {:?}: {:?}",
             QUORUM,
-            parties.getKeys().quorum_X(&QUORUM.to_vec())
+            parties.threshold_keys().collective_pub(&QUORUM.to_vec())
         );
         println!("==");
     }
@@ -41,7 +41,7 @@ fn main() {
     println!("- {}", sig1);
     println!(
         "- validates? {}",
-        sig1.verify(&MESSAGE_BYTES[..], parties.getKeys())
+        sig1.verify(&MESSAGE_BYTES[..], parties.threshold_keys())
     );
     println!("==");
 
@@ -50,7 +50,7 @@ fn main() {
     println!("- Before: {}", sig1);
     println!(
         "- After: {}",
-        ThresholdSignature::sign(&MESSAGE_BYTES[..], &parties.getKeys(), &QUORUM.to_vec())
+        ThresholdSignature::sign(&MESSAGE_BYTES[..], &parties.threshold_keys(), &QUORUM.to_vec())
     );
     println!("==");
 
@@ -60,12 +60,12 @@ fn main() {
     let advers_recon: ThresholdKeyPairs = ThresholdKeyPairs::from(
         vec![
             stolen1,
-            parties.getKeys().getParty(2),
-            parties.getKeys().getParty(3),
-            parties.getKeys().getParty(4),
+            parties.threshold_keys().get(2).clone(),
+            parties.threshold_keys().get(3).clone(),
+            parties.threshold_keys().get(4).clone(),
             stolen5,
-            parties.getKeys().getParty(6),
-            parties.getKeys().getParty(7),
+            parties.threshold_keys().get(6).clone(),
+            parties.threshold_keys().get(7).clone(),
         ],
         T,
     );
@@ -73,7 +73,7 @@ fn main() {
         ThresholdSignature::sign(&MESSAGE_BYTES[..], &advers_recon, &QUORUM.to_vec());
     println!(
         "- validates? {}",
-        sig2.verify(&MESSAGE_BYTES[..], &parties.getKeys())
+        sig2.verify(&MESSAGE_BYTES[..], &parties.threshold_keys())
     );
     println!("==");
 }
