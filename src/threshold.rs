@@ -2,7 +2,7 @@
 
 use crate::bls::{BLSSignature, KeyPairG2, FE2, GE1, GE2};
 use crate::lagrange::{
-    lagrange_interpolate_f0_X, lagrange_interpolate_f0_sig, lagrange_interpolate_f0_x,
+    lagrange_interpolate_f0,
 };
 
 use std::fmt;
@@ -75,21 +75,11 @@ impl ThresholdKeyPairs {
     }
 
     pub fn quorum_X(&self, quorum: &Vec<usize>) -> GE2 {
-        lagrange_interpolate_f0_X(
+        lagrange_interpolate_f0(
             &quorum
                 .into_iter()
                 .map(|idx: &usize| idx + 1)
                 .zip(self.get_X(&quorum).into_iter())
-                .collect(),
-        )
-    }
-
-    pub fn quorum_x(&self, quorum: &Vec<usize>) -> FE2 {
-        lagrange_interpolate_f0_x(
-            &quorum
-                .into_iter()
-                .map(|idx: &usize| idx + 1)
-                .zip(self.get_x(&quorum).into_iter())
                 .collect(),
         )
     }
@@ -114,7 +104,7 @@ impl ThresholdSignature {
         for x in tkps.get_x(quorum) {
             sigmas.push(BLSSignature::sign(message, &x).sigma);
         }
-        let sigma = lagrange_interpolate_f0_sig(
+        let sigma = lagrange_interpolate_f0(
             &quorum
                 .into_iter()
                 .map(|idx: &usize| idx + 1)
