@@ -1,5 +1,7 @@
 # Proactive refresh for BLS threshold signatures
 
+![overview](diagrams/overview.png)
+
 Based on ["Proactive Refresh for Accountable Threshold Signatures" by D Boneh, A Partap, L Rotem](https://eprint.iacr.org/2022/1656.pdf).
 
 ## Motivation 
